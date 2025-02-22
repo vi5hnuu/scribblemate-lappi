@@ -44,10 +44,8 @@ let dynamicBrushOpacity = 0.5;
 let selectedBrushOpacity = 0.5;
 
 // brush size
-let brushSizePx = 1;
-let brushDynamicSizePx = 1;
-ctx.lineWidth = brushSizePx;
-ctx.strokeStyle = selectedBrushColor
+let brushSizePx = 24;
+let brushDynamicSizePx = 24;
 
 // selected tool
 let selectedTool = null
@@ -111,22 +109,6 @@ ipcRenderer.on("status-update", (event, message) => {
   // document.getElementById("status-bar").innerText = message;
 });
 
-function drawPoint(x, y, pressure) {
-  console.log('drawing at', x, y)
-  if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) {
-    console.warn(`Skipping out-of-bounds point: (${x}, ${y})`);
-    return;
-  }
-
-  const size = Math.max(2, pressure * 2);
-  ctx.globalAlpha = Math.min(2, 1);
-  ctx.fillStyle = "rgba(0, 0, 255, 1)";
-
-  ctx.beginPath();
-  ctx.arc(x, y, size, 0, 2 * Math.PI);
-  ctx.fill();
-  ctx.closePath();
-}
 
 // instructions
 const instructions = document.querySelector('.instructions');
@@ -257,6 +239,7 @@ toolEraser.addEventListener('click', (event) => {
 
 toolBrushWidth.addEventListener('click', (event) => {
   debugger;
+  brushSizeRange.value = brushSizePx;
   brushSizePreview.style.backgroundColor = utility.modifyAlpha(selectedBrushColor, selectedBrushOpacity);
   brushSizePreview.style.height = `${brushSizePx}px`;
 
@@ -282,7 +265,6 @@ btnSelectSize.addEventListener('click', (event) => {
   ctx.lineWidth = brushSizePx;
 
   closeAllModels();
-  brushSizePreview.style.height = `${brushSizePx}px`;
 });
 
 btnCancelSize.addEventListener('click', (event) => {
@@ -307,15 +289,19 @@ const startDrawing = (event) => {
   isMouseDown = true;
   [x, y] = [event.offsetX, event.offsetY];
 }
+
 const drawLine = (event) => {
   if (isMouseDown) {
+    ctx.lineWidth = brushSizePx;
+    ctx.strokeStyle = selectedBrushColor
+    ctx.lineCap = "round";
+
     const newX = event.offsetX;
     const newY = event.offsetY;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(newX, newY);
     ctx.stroke();
-    //[x, y] = [newX, newY];
     x = newX;
     y = newY;
   }
@@ -325,3 +311,11 @@ canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', drawLine);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mouseout', stopDrawing);
+
+// reset color
+document.addEventListener('keydown', (event) => {
+  if (event.shiftKey && event.ctrlKey && event.key.toUpperCase() === "R") {
+    selectedBackgroundColor = 'rgba(0,0,0,0)';
+    canvas.style.backgroundColor = selectedBackgroundColor;
+  }
+})
