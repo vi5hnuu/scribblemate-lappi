@@ -1,0 +1,17 @@
+{
+  "name": "scribblemate",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --trace-warnings",
+    "start-live": "electronmon . --trace-warnings",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "electron": "^34.2.0"
+  }
+}

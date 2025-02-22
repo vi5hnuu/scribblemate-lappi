@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+  background-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html {
+  --font-variation-settings: "FILL" 0, "wght" 200, "GRAD" 200, "opsz" 48;
+}
+
+.material-symbols-outlined .fill {
+  font-variation-settings: var(--font-variation-settings), "FILL" 1;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+  height: 100vh;
+  width: 100vw;
+  /* ✅ Make the entire background transparent */
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 255, 0, 0.1);
+}
+
+#status-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+}
+
+/* common classes */
+.hide {
+  display: none;
+}
+
+/* animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 500ms ease-in-out forwards;
+}
+
+/* tools menu */
+.tools-menu {
+  background-color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  left: 2rem;
+  top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tools-menu .tool {
+  transition: all 100ms;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem;
+  border-radius: 9999px;
+  aspect-ratio: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tools-menu .tool:not(.selected):hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.tools-menu .tool.exit:hover {
+  background-color: red;
+  color: white;
+}
+
+.tools-menu .tool.selected {
+  background-color: rgba(0, 255, 0, 0.7);
+}
+
+.tools-menu .tool.selected:hover {
+  background-color: rgba(0, 255, 0, 1);
+}
+
+/* instructions */
+.instructions {
+  background-color: white;
+  border-radius: 1rem;
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  padding: 0rem 1.5rem;
+}
+
+.instructions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.instructions .instruction {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1rem;
+  font-weight: 100;
+  font-family: monospace, "Courier New", Courier;
+}
+
+.instructions > .note span:first-child {
+  color: red;
+  font-weight: bold;
+}
+
+.instructions .instruction-icon > img {
+  transition: all 500ms;
+  width: 3rem;
+  aspect-ratio: 1;
+}
+
+.instructions .instruction-icon > img:hover {
+  scale: 1.1;
+}
+
+.instructions .instruction-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 15rem;
+}
+
+/* scribble-mode */
+.scribble-mode {
+  border: 3px solid white;
+  width: 1rem;
+  height: 1rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  background-color: red;
+  border-radius: 10000px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}

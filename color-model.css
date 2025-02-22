@@ -1,0 +1,64 @@
+#colorModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.color-model-header {
+  width: 100%;
+  display: flex;
+  font-size: 1rem;
+}
+
+.color-model-header h2 {
+  margin-top: 0;
+}
+
+.color-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.color-modal-content > div:first-child {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.color-modal-content > div:last-child {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: end;
+}
+
+.color-modal-content > div:last-child > button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#colorPreview {
+  width: 100%;
+  height: 50px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#selectColor {
+  background-color: green;
+  color: white;
+}
+
+#cancelColor {
+  background-color: red;
+  color: white;
+}
