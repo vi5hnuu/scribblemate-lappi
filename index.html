@@ -8,6 +8,7 @@
   <script src="./script.js" defer></script>
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="color-model.css">
+  <link rel="stylesheet" href="brush-model.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&text=stylus_pen,palette,fit_width,format_paint,undo,redo,ink_eraser_off,logout" />
 </head>
 
@@ -113,7 +114,7 @@
   <canvas id="canvas"></canvas>
 
 
-  <div class="hide" id="colorModal">
+  <div class="hide model" id="colorModal">
     <div class="color-model-header">
       <h2>Select Color</h2>
     </div>
@@ -133,6 +134,26 @@
       <div class="actions">
         <button id="selectColor">Select</button>
         <button id="cancelColor">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="model" id="brushSizeModel">
+    <div class="brush-model-header">
+      <h2>Select brush size</h2>
+    </div>
+    <div class="brush-modal-content">
+      <div>
+        <label>Brush Size:</label>
+        <input title="size range" type="range" id="brushSizeSlider" min="1" max="100" step="1" value="1">
+      </div>
+
+      <div id="brush-size-preview"></div>
+
+      <!-- Buttons -->
+      <div class="actions">
+        <button id="selectSize">Select</button>
+        <button id="cancelSize">Cancel</button>
       </div>
     </div>
   </div>

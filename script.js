@@ -23,6 +23,13 @@ const opacityRange = colorPickerModel.querySelector('input[type=range]');
 const btnSelectColor = colorPickerModel.querySelector('#selectColor');
 const btnCancelColor = colorPickerModel.querySelector('#cancelColor');
 
+
+const brushSizeModel = document.getElementById('brushSizeModel');
+const brushSizePreview = brushSizeModel.querySelector('#brush-size-preview')
+const btnSelectSize = brushSizeModel.querySelector('#selectSize');
+const btnCancelSize = brushSizeModel.querySelector('#cancelSize');
+const brushSizeRange = brushSizeModel.querySelector('input[type=range]');
+
 // scribble background color
 let dynamicBackgroundColor = 'rgb(255,0,0)';
 let selectedBackgroundColor = 'rgb(255,0,0)';
@@ -35,12 +42,21 @@ let selectedBrushColor = 'rgb(0,255,0)';
 let dynamicBrushOpacity = 0.5;
 let selectedBrushOpacity = 0.5;
 
+// brush size
+let brushSizePx = 1;
+let brushDynamicSizePx = 1;
+
 // selected tool
 let selectedTool = null
 selectUnselectTool(TOOL_PEN);
 
 function selectUnselectTool(tool, select = true) {
   unselectedAllTool();
+
+  if (![TOOL_SCRIBBLE_PALLET, TOOL_BRUSH_COLOR].includes(tool)) {
+    colorPickerModel.classList.add('hide');
+  }
+
   selectedTool = select ? tool : null;
   if (tool === TOOL_PEN) {
     debugger
@@ -70,6 +86,11 @@ function selectUnselectTool(tool, select = true) {
 
 function unselectedAllTool() {
   toolsMenu.querySelectorAll('.tool').forEach((tool) => tool.classList.remove('selected'));
+}
+
+function closeAllModels() {
+  colorPickerModel.classList.add('hide');
+  brushSizeModel.classList.add('hide');
 }
 
 // Resize canvas to match Electron window
@@ -187,20 +208,21 @@ function openCloseColorPicker(tool) {
   if (tool !== selectedTool || ![TOOL_BRUSH_COLOR, TOOL_SCRIBBLE_PALLET].includes(tool)) {
     colorPickerModel.classList.add('hide');
   } else {
+    closeAllModels();
     colorPickerModel.classList.remove('hide');
   }
 }
 
-
-colorInput.addEventListener('change', (event) => {
-  const rgba = utility.hexToRgba(event.target.value, selectedTool === TOOL_BRUSH_COLOR ? dynamicBrushOpacity : dynamicBackgroundOpacity);
-  if (selectedTool === TOOL_BRUSH_COLOR) {
-    dynamicBrushColor = rgba;
-  } else if (selectedTool === TOOL_SCRIBBLE_PALLET) {
-    dynamicBackgroundColor = rgba;
-  }
-  colorPreview.style.backgroundColor = rgba;
-});
+~
+  colorInput.addEventListener('change', (event) => {
+    const rgba = utility.hexToRgba(event.target.value, selectedTool === TOOL_BRUSH_COLOR ? dynamicBrushOpacity : dynamicBackgroundOpacity);
+    if (selectedTool === TOOL_BRUSH_COLOR) {
+      dynamicBrushColor = rgba;
+    } else if (selectedTool === TOOL_SCRIBBLE_PALLET) {
+      dynamicBackgroundColor = rgba;
+    }
+    colorPreview.style.backgroundColor = rgba;
+  });
 opacityRange.addEventListener('input', (event) => {
   if (selectedTool === TOOL_BRUSH_COLOR) {
     dynamicBrushOpacity = event.target.value;
@@ -225,6 +247,40 @@ btnCancelColor.addEventListener('click', (event) => {
   selectUnselectTool(selectedTool === TOOL_BRUSH_COLOR ? TOOL_BRUSH_COLOR : TOOL_SCRIBBLE_PALLET, false);
 })
 
+toolEraser.addEventListener('click', (event) => {
+  selectUnselectTool(TOOL_ERASER, !toolEraser.classList.contains('selected'));
+})
+
+toolBrushWidth.addEventListener('click', (event) => {
+  debugger;
+  brushSizePreview.style.backgroundColor = utility.modifyAlpha(selectedBrushColor, selectedBrushOpacity);
+  brushSizePreview.style.height = `${brushSizePx}px`;
+
+  selectUnselectTool(TOOL_BRUSH_SIZE, selectedTool !== TOOL_BRUSH_SIZE || brushSizeModel.classList.contains('hide'));
+  if (selectedTool === TOOL_BRUSH_SIZE) {
+    closeAllModels();
+    brushSizeModel.classList.remove('hide');
+  } else {
+    brushSizeModel.classList.add('hide');
+  }
+})
+
+brushSizeRange.addEventListener('input', (event) => {
+  debugger
+  brushDynamicSizePx = event.target.value;
+  brushSizePreview.style.height = `${brushDynamicSizePx}px`;
+});
+
+btnSelectSize.addEventListener('click', (event) => {
+  brushSizePx = event.target.value;
+  closeAllModels();
+  brushSizePreview.style.height = `${brushSizePx}px`;
+});
+
+btnCancelSize.addEventListener('click', (event) => {
+  closeAllModels();
+  selectUnselectTool(TOOL_BRUSH_SIZE, false);
+});
 
 toolExit.addEventListener('click', (event) => {
   ipcRenderer.send('QUIT_APP', true);
