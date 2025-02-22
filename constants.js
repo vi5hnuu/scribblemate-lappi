@@ -5,6 +5,7 @@ const TOOL_BRUSH_COLOR = 'TOOL_BRUSH_COLOR';
 const TOOL_UNDO = 'TOOL_UNDO';
 const TOOL_REDO = 'TOOL_REDO';
 const TOOL_ERASER = 'TOOL_ERASER';
+const TOOL_CLEAR_CANVAS = 'TOOL_CLEAR_CANVAS';
 
 module.exports = {
   TOOL_PEN,
@@ -13,5 +14,6 @@ module.exports = {
   TOOL_BRUSH_COLOR,
   TOOL_UNDO,
   TOOL_REDO,
-  TOOL_ERASER
+  TOOL_ERASER,
+  TOOL_CLEAR_CANVAS
 }

@@ -1,4 +1,4 @@
-const { TOOL_PEN, TOOL_SCRIBBLE_PALLET, TOOL_BRUSH_SIZE, TOOL_BRUSH_COLOR, TOOL_UNDO, TOOL_REDO, TOOL_ERASER } = require('./constants.js');
+const { TOOL_PEN, TOOL_SCRIBBLE_PALLET, TOOL_BRUSH_SIZE, TOOL_BRUSH_COLOR, TOOL_UNDO, TOOL_REDO, TOOL_ERASER, TOOL_CLEAR_CANVAS } = require('./constants.js');
 const utility = require('./utility.js')
 const {
   ipcRenderer, app
@@ -14,6 +14,7 @@ const toolBrushColor = toolsMenu.querySelector('.tool.brush-color');
 const toolUndo = toolsMenu.querySelector('.tool.undo');
 const toolRedo = toolsMenu.querySelector('.tool.redo');
 const toolEraser = toolsMenu.querySelector('.tool.eraser');
+const toolClearCanvas = toolsMenu.querySelector('.tool.clear-canvas');
 const toolExit = toolsMenu.querySelector('.tool.exit');
 
 const colorPickerModel = document.getElementById('colorModal');
@@ -45,6 +46,8 @@ let selectedBrushOpacity = 0.5;
 // brush size
 let brushSizePx = 1;
 let brushDynamicSizePx = 1;
+ctx.lineWidth = brushSizePx;
+ctx.strokeStyle = selectedBrushColor
 
 // selected tool
 let selectedTool = null
@@ -236,6 +239,7 @@ opacityRange.addEventListener('input', (event) => {
 btnSelectColor.addEventListener('click', (event) => {
   if (selectedTool === TOOL_BRUSH_COLOR) {
     selectedBrushColor = utility.modifyAlpha(dynamicBrushColor, selectedBrushOpacity = dynamicBrushOpacity);
+    ctx.strokeStyle = selectedBrushColor
   } else if (selectedTool === TOOL_SCRIBBLE_PALLET) {
     canvas.style.backgroundColor = selectedBackgroundColor = utility.modifyAlpha(dynamicBackgroundColor, selectedBackgroundOpacity = dynamicBackgroundOpacity);
   }
@@ -272,7 +276,11 @@ brushSizeRange.addEventListener('input', (event) => {
 });
 
 btnSelectSize.addEventListener('click', (event) => {
-  brushSizePx = event.target.value;
+  brushSizePx = brushDynamicSizePx;
+  debugger
+  //canvas line width
+  ctx.lineWidth = brushSizePx;
+
   closeAllModels();
   brushSizePreview.style.height = `${brushSizePx}px`;
 });
@@ -282,6 +290,38 @@ btnCancelSize.addEventListener('click', (event) => {
   selectUnselectTool(TOOL_BRUSH_SIZE, false);
 });
 
+toolClearCanvas.addEventListener('click', (event) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+})
+
 toolExit.addEventListener('click', (event) => {
   ipcRenderer.send('QUIT_APP', true);
 })
+
+
+// canvas drawing
+let x = 0, y = 0;
+let isMouseDown = false;
+const stopDrawing = () => { isMouseDown = false; }
+const startDrawing = (event) => {
+  isMouseDown = true;
+  [x, y] = [event.offsetX, event.offsetY];
+}
+const drawLine = (event) => {
+  if (isMouseDown) {
+    const newX = event.offsetX;
+    const newY = event.offsetY;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(newX, newY);
+    ctx.stroke();
+    //[x, y] = [newX, newY];
+    x = newX;
+    y = newY;
+  }
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', drawLine);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
