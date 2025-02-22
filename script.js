@@ -273,15 +273,38 @@ btnCancelSize.addEventListener('click', (event) => {
 });
 
 toolClearCanvas.addEventListener('click', (event) => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  clearCanvas();
+})
+
+toolPen.addEventListener('click', (event) => {
+  selectUnselectTool(TOOL_PEN, !toolPen.classList.contains('selected'));
 })
 
 toolExit.addEventListener('click', (event) => {
   ipcRenderer.send('QUIT_APP', true);
 })
 
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
 
 // canvas drawing
+const history = [];
+let redoStack = [];
+const maxHistory = 50; // Limit history to avoid memory issues
+
+// Function to save canvas state
+const saveState = () => {
+  sanitizeUndoRedo(); // Remove oldest if limit is reached
+  history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  redoStack = []; // Clear redo history when new action is taken
+};
+
+function sanitizeUndoRedo() {
+  if (history.length >= maxHistory) history.shift(); // Remove oldest if limit is reached
+  if (redoStack.length >= maxHistory) redoStack.shift(); // Remove oldest if limit is reached
+}
+
 let x = 0, y = 0;
 let isMouseDown = false;
 const stopDrawing = () => { isMouseDown = false; }
@@ -291,7 +314,8 @@ const startDrawing = (event) => {
 }
 
 const drawLine = (event) => {
-  if (isMouseDown) {
+  if (isMouseDown && [TOOL_ERASER, TOOL_PEN].includes(selectedTool)) {
+    saveState();
     ctx.lineWidth = brushSizePx;
     ctx.strokeStyle = selectedBrushColor
     ctx.lineCap = "round";
@@ -301,6 +325,15 @@ const drawLine = (event) => {
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(newX, newY);
+
+    // Check if eraser is selected
+    if (selectedTool == TOOL_ERASER) {
+      ctx.globalCompositeOperation = "destination-out"; // Erase mode
+    } else {
+      ctx.globalCompositeOperation = "source-over"; // Normal drawing mode
+      ctx.strokeStyle = selectedBrushColor;
+    }
+
     ctx.stroke();
     x = newX;
     y = newY;
@@ -312,10 +345,59 @@ canvas.addEventListener('mousemove', drawLine);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mouseout', stopDrawing);
 
+// Undo function
+const undo = () => {
+  if (history.length > 0) {
+    redoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); // Save current state for redo
+    sanitizeUndoRedo();
+    const previousState = history.pop(); // Get last saved state
+    ctx.putImageData(previousState, 0, 0);
+  }
+};
+
+// Redo function
+const redo = () => {
+  if (redoStack.length > 0) {
+    history.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); // Save current state before redoing
+    sanitizeUndoRedo();
+    const nextState = redoStack.pop(); // Get last undone state
+    ctx.putImageData(nextState, 0, 0);
+  }
+};
+
+toolUndo.addEventListener('click', (event) => {
+  undo();
+  enableDisableUndoRedo();
+})
+toolRedo.addEventListener('click', (event) => {
+  redo();
+  enableDisableUndoRedo();
+})
+
+function enableDisableUndoRedo() {
+  if (!history.length) {
+    toolUndo.classList.add('disabled');
+  } else {
+    toolUndo.classList.remove('disabled');
+  }
+  if (!redoStack.length) {
+    toolRedo.classList.add('disabled');
+  } else {
+    toolRedo.classList.remove('disabled');
+  }
+}
+
 // reset color
 document.addEventListener('keydown', (event) => {
-  if (event.shiftKey && event.ctrlKey && event.key.toUpperCase() === "R") {
+  if (!(event.shiftKey && event.ctrlKey)) return;
+  if (event.key.toUpperCase() === "R") {
     selectedBackgroundColor = 'rgba(0,0,0,0)';
     canvas.style.backgroundColor = selectedBackgroundColor;
+  } else if (event.key.toUpperCase() === "P") {
+    selectUnselectTool(TOOL_PEN);
+  } else if (event.key.toUpperCase() === "E") {
+    selectUnselectTool(TOOL_ERASER);
+  } else if (event.key.toUpperCase() === "C") {
+    clearCanvas();
   }
 })
