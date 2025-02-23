@@ -23,6 +23,7 @@ app.whenReady().then(() => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize; // Get screen size
 
   mainWindow = new BrowserWindow({
+    icon: path.join(__dirname, 'icon.ico'),
     width: width,
     height: height,
     transparent: true,
