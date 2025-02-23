@@ -12,6 +12,7 @@
   "build": {
     "appId": "com.vi5hnu.scribblemate",
     "mac": {
+      "icon": "icon.icns",
       "target": "dmg",
       "category": "public.art-design.graphics-design"
     }
