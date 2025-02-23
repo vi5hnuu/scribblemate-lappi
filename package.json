@@ -6,6 +6,10 @@
   "description": "ScribbleMate - A drawing overlay tool for macOS/windows.",
   "scripts": {
     "start": "electron . --trace-warnings",
+    "build:mac": "npx electron-builder --mac dmg",
+    "build:win-nsis": "npx electron-builder --win nsis",
+    "build:win-por": "npx electron-builder --win portable",
+    "build:win-zip": "npx electron-builder --win zip",
     "start-live": "electronmon . --trace-warnings",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +19,20 @@
       "icon": "icon.icns",
       "target": "dmg",
       "category": "public.art-design.graphics-design"
+    },
+    "win": {
+      "icon": "icon.ico",
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   },
   "keywords": [],
@@ -23,5 +41,5 @@
   "devDependencies": {
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8"
-  }
-}
+  },
+  
